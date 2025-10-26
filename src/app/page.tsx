@@ -54,9 +54,21 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
       <div className="mx-auto max-w-2xl p-6">
-        <h1 className="text-2xl font-semibold mb-4 text-center">
-          PDF granskning
-        </h1>
+        <div className="mb-4 grid grid-cols-1 items-center">
+          <div /> {/* left spacer */}
+          <h1 className="justify-start text-2xl font-semibold">
+            PDF granskare
+          </h1>
+          <button
+            onClick={async () => {
+              await fetch("/api/logout", { method: "POST" });
+              window.location.href = "/login";
+            }}
+            className="justify-self-end px-3 py-2 rounded-xl bg-black text-white hover:opacity-90 cursor-pointer"
+          >
+            Logga ut
+          </button>
+        </div>
 
         <form
           onSubmit={upload}
