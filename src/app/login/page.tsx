@@ -22,7 +22,6 @@ export default function LoginPage() {
       setBusy(false);
       return;
     }
-    // Gå tillbaka till startsidan (eller "next" param om du vill)
     const next = new URLSearchParams(window.location.search).get("next") || "/";
     window.location.href = next;
   }

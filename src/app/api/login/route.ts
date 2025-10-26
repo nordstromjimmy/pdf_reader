@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   const { password } = await req.json().catch(() => ({}));
   const correct = process.env.APP_PASSWORD!;
-  // Enkel, men lägg gärna till rate limiting om du vill
+
   if (!password || password !== correct) {
     return NextResponse.json({ error: "Fel lösenord" }, { status: 401 });
   }
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     value,
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production", // true om du kör HTTPS/tunnel
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge,
   });

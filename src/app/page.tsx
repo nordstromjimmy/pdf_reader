@@ -18,7 +18,6 @@ export default function Home() {
         setBusy(false);
         return;
       }
-      // Visa en kort bekräftelse i svaret (valfritt)
       setAnswer("Filen uppladdad, ställ en fråga");
     } catch (err: any) {
       setAnswer(`Fel vid uppladdning: ${err?.message ?? String(err)}`);
@@ -112,7 +111,6 @@ export default function Home() {
           </button>
         </form>
 
-        {/* Spinner (visas bara när busy=true) */}
         {busy && (
           <div className="mt-4 flex justify-center">
             <span
@@ -122,7 +120,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Svar */}
         {!busy && answer && (
           <pre className="mt-4 whitespace-pre-wrap bg-white p-4 rounded-2xl shadow">
             {answer}

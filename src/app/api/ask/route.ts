@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
 
     const resp = await client.responses.create({
       model: MODEL,
-      // You can also use: input: question
       input: [
         {
           role: "system",
@@ -29,7 +28,6 @@ export async function POST(req: NextRequest) {
         },
         { role: "user", content: question },
       ],
-      // ⬇️ Inline the vector store IDs on the tool itself
       tools: [
         {
           type: "file_search",
@@ -39,13 +37,10 @@ export async function POST(req: NextRequest) {
       max_output_tokens: 400,
     });
 
-    // Extract plain text robustly across SDK shapes
     let answer = "";
-    // Newer shape: resp.output = [{ type: "output_text", text: { value } }, ...]
     if (Array.isArray((resp as any).output)) {
       for (const item of (resp as any).output) {
         if (item.type === "output_text") {
-          // some versions use item.text, some item.text.value
           answer += item.text?.value ?? item.text ?? "";
         }
       }

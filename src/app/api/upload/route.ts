@@ -5,7 +5,6 @@ export const runtime = "nodejs";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
-  // Some SDK versions still expect this for vector stores / assistants v2
   defaultHeaders: { "OpenAI-Beta": "assistants=v2" },
 });
 
@@ -26,7 +25,7 @@ export async function POST(req: Request) {
 
   // 1) Upload the web File directly (no fs, no tmp paths)
   const uploaded = await client.files.create({
-    file, // <-- pass the File object directly
+    file,
     purpose: "assistants",
   });
 
