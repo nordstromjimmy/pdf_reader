@@ -51,79 +51,103 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="mx-auto max-w-2xl p-6">
-        <div className="mb-4 grid grid-cols-1 items-center">
-          <div /> {/* left spacer */}
-          <h1 className="justify-start text-2xl font-semibold">
-            PDF granskare
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900">
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            PDF&nbsp;<span className="text-slate-500">granskare</span>
           </h1>
           <button
             onClick={async () => {
               await fetch("/api/logout", { method: "POST" });
               window.location.href = "/login";
             }}
-            className="justify-self-end px-3 py-2 rounded-xl bg-black text-white hover:opacity-90 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-white shadow-sm transition hover:shadow-md hover:opacity-95 active:scale-[0.98] cursor-pointer"
           >
-            Logga ut
+            <span>Logga ut</span>
           </button>
         </div>
 
+        {/* Upload card */}
         <form
           onSubmit={upload}
-          className="p-4 bg-white rounded-2xl shadow mb-6 space-y-3"
+          className="group mb-6 rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition hover:shadow-md"
         >
-          <label className="block text-sm font-medium">Ladda upp PDF</label>
-          <input
-            name="pdf"
-            type="file"
-            accept="application/pdf"
-            required
-            className="block w-full rounded border p-2"
-            disabled={busy}
-          />
-          <button
-            disabled={busy}
-            className="px-4 py-2 rounded-xl bg-black text-white disabled:opacity-50 cursor-pointer"
-          >
-            Ladda upp
-          </button>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Ladda upp PDF
+          </label>
+
+          {/* Nicely styled input */}
+          <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-4 transition group-hover:border-slate-300">
+            <input
+              name="pdf"
+              type="file"
+              accept="application/pdf"
+              required
+              disabled={busy}
+              className="block w-full cursor-pointer rounded-lg border border-slate-200 bg-white p-2.5 text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            />
+          </div>
+
+          <div className="mt-4 flex items-center justify-end">
+            <button
+              disabled={busy}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-white shadow-sm transition hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {busy && (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              )}
+              <span>Ladda upp</span>
+            </button>
+          </div>
         </form>
 
+        {/* Ask card */}
         <form
           onSubmit={ask}
-          className="p-4 bg-white rounded-2xl shadow space-y-3"
+          className="rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition hover:shadow-md"
         >
-          <label className="block text-sm font-medium">
+          <label className="block text-sm font-medium text-slate-700 mb-2">
             Ställ en fråga om filen
           </label>
           <input
             name="question"
-            placeholder=""
-            className="w-full rounded border p-2"
+            placeholder="Skriv en fråga.."
             disabled={busy}
+            className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
           />
-          <button
-            disabled={busy}
-            className="px-4 py-2 rounded-xl bg-black text-white disabled:opacity-50 cursor-pointer"
-          >
-            Fråga
-          </button>
+          <div className="mt-4 flex items-center justify-end">
+            <button
+              disabled={busy}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-white shadow-sm transition hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {busy && (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              )}
+              <span>Fråga</span>
+            </button>
+          </div>
         </form>
 
+        {/* Global spinner under cards (optional visual) */}
         {busy && (
-          <div className="mt-4 flex justify-center">
+          <div className="mt-6 flex justify-center">
             <span
-              className="h-6 w-6 rounded-full border-2 border-gray-300 border-t-black animate-spin"
+              className="h-6 w-6 rounded-full border-2 border-slate-300 border-t-slate-900 animate-spin"
               aria-label="Laddar"
             />
           </div>
         )}
 
+        {/* Answer */}
         {!busy && answer && (
-          <pre className="mt-4 whitespace-pre-wrap bg-white p-4 rounded-2xl shadow">
-            {answer}
-          </pre>
+          <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="mb-3 text-sm font-medium text-slate-500">Svar</div>
+            <pre className="max-h-[70vh] overflow-auto whitespace-pre-wrap leading-relaxed text-slate-800">
+              {answer}
+            </pre>
+          </div>
         )}
       </div>
     </main>

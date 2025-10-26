@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
           vector_store_ids: [vectorStoreId],
         } as any,
       ],
-      max_output_tokens: 400,
+      max_output_tokens: 1200,
     });
 
     let answer = "";
