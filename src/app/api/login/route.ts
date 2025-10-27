@@ -5,21 +5,11 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json().catch(() => ({}));
-  const correct = process.env.APP_PASSWORD!;
-
-  if (!password || password !== correct) {
+  if (!password || password !== process.env.APP_PASSWORD) {
     return NextResponse.json({ error: "Fel lösenord" }, { status: 401 });
   }
-  const { name, value, maxAge } = createSessionCookie();
+  const cookie = createSessionCookie();
   const res = NextResponse.json({ ok: true });
-  res.cookies.set({
-    name,
-    value,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge,
-  });
+  res.cookies.set(cookie);
   return res;
 }

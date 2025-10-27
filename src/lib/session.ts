@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-const COOKIE = "pdfqa_auth";
+export const COOKIE_NAME = "pdfqa_auth";
 
 function b64url(buf: Buffer) {
   return buf
@@ -10,8 +10,18 @@ function b64url(buf: Buffer) {
     .replace(/=+$/g, "");
 }
 
+function commonCookieAttrs() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production", // true if HTTPS/tunnel
+    path: "/",
+    // NOTE: don't set 'domain' for IP hosts; for your own domain you can add domain: ".yourdomain.com"
+  };
+}
+
 export function createSessionCookie() {
-  const ttl = Number(process.env.SESSION_TTL_SECONDS || 60 * 60 * 24 * 7); // default 7d
+  const ttl = Number(process.env.SESSION_TTL_SECONDS || 60 * 60 * 24 * 7);
   const payload = {
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + ttl,
@@ -20,7 +30,23 @@ export function createSessionCookie() {
   const body = Buffer.from(JSON.stringify(payload));
   const sig = crypto.createHmac("sha256", secret).update(body).digest();
   const token = `${b64url(body)}.${b64url(sig)}`;
-  return { name: COOKIE, value: token, maxAge: ttl };
+
+  return {
+    name: COOKIE_NAME,
+    value: token,
+    maxAge: ttl,
+    ...commonCookieAttrs(),
+  };
+}
+
+export function clearCookie() {
+  return {
+    name: COOKIE_NAME,
+    value: "",
+    maxAge: 0,
+    expires: new Date(0),
+    ...commonCookieAttrs(),
+  };
 }
 
 export function verifySessionCookie(token?: string) {
@@ -46,9 +72,3 @@ export function verifySessionCookie(token?: string) {
     return false;
   }
 }
-
-export function clearCookie() {
-  return { name: COOKIE, value: "", maxAge: 0 };
-}
-
-export const COOKIE_NAME = COOKIE;
