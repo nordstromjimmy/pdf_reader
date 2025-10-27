@@ -11,7 +11,7 @@ const PUBLIC_PATHS = new Set([
   "/favicon.ico",
 ]);
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow Next.js assets & explicitly public routes
