@@ -10,17 +10,18 @@ function b64url(buf: Buffer) {
     .replace(/=+$/g, "");
 }
 
-function commonCookieAttrs() {
+// Default to HTTP (not secure). We'll pass true from API when behind HTTPS.
+export function commonCookieAttrs(isHttps: boolean = false) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production", // true if HTTPS/tunnel
+    secure: isHttps,
     path: "/",
-    // NOTE: don't set 'domain' for IP hosts; for your own domain you can add domain: ".yourdomain.com"
+    // no 'domain' for IP hosts; add domain: ".yourdomain.com" if you always use a domain
   };
 }
 
-export function createSessionCookie() {
+export function createSessionCookie(isHttps: boolean = false) {
   const ttl = Number(process.env.SESSION_TTL_SECONDS || 60 * 60 * 24 * 7);
   const payload = {
     iat: Math.floor(Date.now() / 1000),
@@ -35,17 +36,17 @@ export function createSessionCookie() {
     name: COOKIE_NAME,
     value: token,
     maxAge: ttl,
-    ...commonCookieAttrs(),
+    ...commonCookieAttrs(isHttps),
   };
 }
 
-export function clearCookie() {
+export function clearCookie(isHttps: boolean = false) {
   return {
     name: COOKIE_NAME,
     value: "",
     maxAge: 0,
     expires: new Date(0),
-    ...commonCookieAttrs(),
+    ...commonCookieAttrs(isHttps),
   };
 }
 
@@ -53,6 +54,7 @@ export function verifySessionCookie(token?: string) {
   if (!token) return false;
   const [bodyB64, sigB64] = token.split(".");
   if (!bodyB64 || !sigB64) return false;
+
   const secret = process.env.SESSION_SECRET!;
   const body = Buffer.from(
     bodyB64.replace(/-/g, "+").replace(/_/g, "/") + "==",
@@ -65,6 +67,7 @@ export function verifySessionCookie(token?: string) {
   const expect = crypto.createHmac("sha256", secret).update(body).digest();
   if (given.length !== expect.length || !crypto.timingSafeEqual(given, expect))
     return false;
+
   try {
     const { exp } = JSON.parse(body.toString());
     return typeof exp === "number" && Date.now() / 1000 < exp;

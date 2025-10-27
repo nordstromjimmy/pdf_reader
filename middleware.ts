@@ -14,12 +14,14 @@ function isPublic(req: NextRequest) {
 export function middleware(req: NextRequest) {
   if (isPublic(req)) {
     const res = NextResponse.next();
-    res.headers.set("Cache-Control", "no-store"); // login page too
+    res.headers.set("X-Auth-Guard", "public");
+    res.headers.set("Cache-Control", "no-store");
     return res;
   }
 
   const token = req.cookies.get(COOKIE_NAME)?.value;
   const ok = verifySessionCookie(token);
+
   if (!ok) {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
@@ -28,10 +30,9 @@ export function middleware(req: NextRequest) {
   }
 
   const res = NextResponse.next();
-  res.headers.set("Cache-Control", "no-store"); // protect against bfcache/stale views
+  res.headers.set("X-Auth-Guard", "protected");
+  res.headers.set("Cache-Control", "no-store");
   return res;
 }
 
-export const config = {
-  matcher: ["/:path*"],
-};
+export const config = { matcher: ["/:path*"] };

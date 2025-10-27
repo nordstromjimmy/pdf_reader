@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSessionCookie } from "@/lib/session";
+import { createSessionCookie, commonCookieAttrs } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -8,8 +8,11 @@ export async function POST(req: NextRequest) {
   if (!password || password !== process.env.APP_PASSWORD) {
     return NextResponse.json({ error: "Fel lösenord" }, { status: 401 });
   }
-  const cookie = createSessionCookie();
+  const isHttps =
+    req.headers.get("x-forwarded-proto") === "https" ||
+    req.nextUrl.protocol === "https:";
+
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(cookie);
+  res.cookies.set(createSessionCookie(isHttps));
   return res;
 }
