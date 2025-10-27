@@ -5,14 +5,16 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json().catch(() => ({}));
-  if (!password || password !== process.env.APP_PASSWORD) {
+  if (password !== process.env.APP_PASSWORD) {
     return NextResponse.json({ error: "Fel lösenord" }, { status: 401 });
   }
+
   const isHttps =
     req.headers.get("x-forwarded-proto") === "https" ||
     req.nextUrl.protocol === "https:";
 
+  const cookie = createSessionCookie(isHttps);
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(createSessionCookie(isHttps));
+  res.cookies.set(cookie); // includes secure/samesite/path/maxAge
   return res;
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearCookie, COOKIE_NAME } from "@/lib/session";
+import { clearCookie } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -9,6 +9,6 @@ export async function POST(req: NextRequest) {
     req.nextUrl.protocol === "https:";
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(clearCookie(isHttps));
+  res.cookies.set(clearCookie(isHttps)); // maxAge:0 + expires:past + same flags
   return res;
 }
