@@ -15,6 +15,6 @@ export async function POST(req: NextRequest) {
 
   const cookie = createSessionCookie(isHttps);
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(cookie); // includes secure/samesite/path/maxAge
+  res.cookies.set(cookie);
   return res;
 }

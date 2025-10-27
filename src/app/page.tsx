@@ -4,6 +4,17 @@ import { useState } from "react";
 export default function Home() {
   const [answer, setAnswer] = useState("");
   const [busy, setBusy] = useState(false);
+  const [lastQuestion, setLastQuestion] = useState("");
+
+  function slugify(s: string) {
+    return s
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\.:/\\]+/g, "-")
+      .replace(/[^a-z0-9-_]/g, "")
+      .replace(/-+/g, "-")
+      .slice(0, 60);
+  }
 
   async function upload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,6 +40,7 @@ export default function Home() {
   async function ask(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const q = (e.currentTarget as any).question.value;
+    setLastQuestion(q);
     setBusy(true);
     setAnswer("");
     try {
@@ -48,6 +60,22 @@ export default function Home() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function downloadAnswer() {
+    if (!answer) return;
+    const prefix = lastQuestion ? slugify(lastQuestion) : "svar";
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `${prefix || "svar"}-${stamp}.txt`;
+    const blob = new Blob([answer], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -143,7 +171,15 @@ export default function Home() {
         {/* Answer */}
         {!busy && answer && (
           <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-3 text-sm font-medium text-slate-500">Svar</div>
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-slate-500">Svar</span>
+              <button
+                onClick={downloadAnswer}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                Spara som .txt
+              </button>
+            </div>
             <pre className="max-h-[70vh] overflow-auto whitespace-pre-wrap leading-relaxed text-slate-800">
               {answer}
             </pre>
