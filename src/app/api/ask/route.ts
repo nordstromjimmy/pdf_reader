@@ -1,3 +1,4 @@
+import { getActiveVectorStoreId } from "@/lib/activeStore";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -9,14 +10,15 @@ const MODEL = "gpt-4.1-mini";
 export async function POST(req: NextRequest) {
   try {
     const { question } = await req.json();
-    const vectorStoreId = process.env.VECTOR_STORE_ID;
+    const vectorStoreId = getActiveVectorStoreId();
     if (!question)
       return NextResponse.json({ error: "Missing question" }, { status: 400 });
-    if (!vectorStoreId)
+    if (!vectorStoreId) {
       return NextResponse.json(
-        { error: "VECTOR_STORE_ID not set" },
+        { error: "Ingen fil uppladdad. Ladda upp en PDF först." },
         { status: 400 }
       );
+    }
 
     const resp = await client.responses.create({
       model: MODEL,
